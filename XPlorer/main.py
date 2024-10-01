@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox, font
 import shutil
 import os
 import ctypes
@@ -62,11 +62,6 @@ custom_title_bar.bind("<Button-1>", drag_window)
 custom_title_bar.bind("<B1-Motion>", drag_window_motion)
 
 def pathChange(*event):
-    try:
-        with open("current_path.pkl", "rb") as f:
-            currentPath.set(pickle.load(f))
-    except FileNotFoundError:
-        currentPath.set("C:")
     # Get all Files and Folders from the given Directory
     directory = os.listdir(currentPath.get())
     # Clearing the list
@@ -318,8 +313,6 @@ text_widget = Text(root, width=50, height=10)
 text_widget.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 def change_listbox_to_homescreen(event=None):
-        with open("current_path.pkl", "wb") as f:
-            pickle.dump(currentPath.get(), f)
         global back_button
         list.delete(0, END)
         list.pack_forget()
@@ -327,7 +320,7 @@ def change_listbox_to_homescreen(event=None):
 
         text_widget.delete(1.0, END)
         text_widget.insert(END, "Welcome back to XPlorer!", "large_font")
-        text_widget.insert(END, "\nWhat's up, what would you do today?", "small_font")
+        text_widget.insert(END, "\nWhat's up, what would you like to do today?", "small_font")
 
         text_widget.tag_config("large_font", font=("Segoe UI", 24), justify=CENTER)
         text_widget.tag_config("small_font", font=("Segoe UI", 12), justify=CENTER)
