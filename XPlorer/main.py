@@ -18,20 +18,57 @@ ctypes.windll.shcore.SetProcessDpiAwareness(True)
 # hidden_window.withdraw()
 # hidden_window.overrideredirect(False)
 
+
+# try:
+#    imageicon = PhotoImage(file=imgicn_path)
+# except Exception as e:
+#    print(f"Error loading image (icon): {e}")
+version1 = "Pre-alpha 3"
+version2 = "0.3.241020"
+version3 = "Pre-alpha 3 (0.3.241020)"
+
 class CustomTitleBar(Frame):
+    global close_button
+    global minimize_button
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
         self.master = master
         self.pack(fill="x")
 
-        self.close_button = Button(self, text="X", command=self.master.destroy, bg="#333333", fg="#ffffff", bd=0)
+        self.close_button = Button(self, text="╳", command=self.master.destroy, bg="#333333", fg="#ffffff", bd=0)
         self.close_button.pack(side="right", padx=5)
 
-        self.minimize_button = Button(self, text="-", command=self.master.iconify, bg="#333333", fg="#ffffff", bd=0)
+        self.minimize_button = Button(self, text="−",  command=print("minimize lol not working"), bg="#333333", fg="#ffffff", bd=0)
         self.minimize_button.pack(side="right", padx=5)
 
-        self.title_label = tk.Label(self, text="XPlorer", font=("Neonclipper-X5JP", 12), bg="#333333", fg="#ffffff")
+        self.title_text = "XPlorer " + version3
+        self.title_label = tk.Label(self, text=self.title_text, font=("Segoe UI", 11), bg="#333333", fg="#ffffff")
         self.title_label.pack(side="left", padx=5)
+
+        def change_x_button_color(event):
+            # global close_button
+            self.close_button.config(fg="#ffffff", bg="#e80000")
+
+        def reset_x_button_color(event=None):
+            # global close_button
+            self.close_button.config(fg="#ffffff", bg="#333333")
+
+        def change_min_button_color(event):
+            # global minimize_button
+            self.minimize_button.config(fg="#ffffff", bg="#07abf7")
+
+        def reset_min_button_color(event=None):
+            # global minimize_button
+            self.minimize_button.config(fg="#ffffff", bg="#333333")
+
+        self.close_button.bind("<Enter>", change_x_button_color)
+        self.close_button.bind("<Leave>", reset_x_button_color)
+        self.close_button.bind("<ButtonRelease-1>", reset_x_button_color)
+
+        self.minimize_button.bind("<Enter>", change_min_button_color)
+        self.minimize_button.bind("<Leave>", reset_min_button_color)
+        self.minimize_button.bind("<ButtonRelease-1>", reset_min_button_color)
+
 
 root = Tk()
 # set a title for our file explorer main window
@@ -101,7 +138,6 @@ def open_popup():
     top.resizable(False, False)
     top.title("Add a file or a folder")
     top.columnconfigure(0, weight=1)
-    top.iconbitmap("icon.ico")
     Label(top, text='Enter File or Folder name', bg="#444444", fg="#ffffff", font=("Segoe UI", 16)).grid()
     Entry(top, textvariable=newFileName, bg="#333333", fg="#ffffff", bd=0, insertbackground="#ffffff", selectbackground="#4cb72c").grid(column=0, pady=10, sticky='NSEW')
     create_button = Button(top, text="Create", command=newFileOrFolder, bg="#333333", fg="#ffffff", bd=0)
@@ -161,13 +197,14 @@ def about():
     top.resizable(False, False)
     top.title("About XPlorer")
     top.columnconfigure(0, weight=1)
+    about_ver_text = "Version " + version3 + " | 11/2024"
     # top.iconbitmap("icon.ico")
     top.config(bg="#333333")
     Label(top, text='About', fg="#ffffff", bg= "#333333", font="Segoe-UI 24").grid()
     Label(top, text='The icon was generated in Google ImageFX!', fg="#ffffff", bg= "#333333").grid()
     Label(top, text='Other icons from Google Fonts.', fg="#ffffff", bg= "#333333").grid()
     Label(top, text='By Galaxica', fg="#ffffff", bg= "#333333").grid()
-    Label(top, text='Version 0.11 | 07/2024', fg="#ffffff", bg= "#333333").grid()
+    Label(top, text=about_ver_text, fg="#ffffff", bg= "#333333").grid()
 
 def new_patch():
     global top
@@ -219,11 +256,13 @@ def change_back_btn_color(event):
 def reset_back_btn_color(event=None):
     back_button.config(fg="#ffffff", bg="#444444")
 
-def change_back_btn_settings_color(event):
-    back_button_settings.config(fg="#eeeeee", bg="#4cb72c")
 
-def reset_back_btn_settings_color(event=None):
-    back_button_settings.config(fg="#ffffff", bg="#444444")
+
+# def change_back_btn_settings_color(event):
+  #  back_button_settings.config(fg="#eeeeee", bg="#4cb72c")
+
+# def reset_back_btn_settings_color(event=None):
+  #  back_button_settings.config(fg="#ffffff", bg="#444444")
 
 
 # Keyboard shortcut for going up
@@ -233,6 +272,9 @@ root.bind("<Alt-Up>", goBack)
 
 
 class CustomMenuBar(Frame):
+    global file_button
+    global edit_button
+    global help_button
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
         self.master = master
@@ -248,11 +290,41 @@ class CustomMenuBar(Frame):
         self.help_button = Button(self, text="Help", command=self.help_menu, bg="#333333", fg="#ffffff", bd=0)
         self.help_button.pack(side="left", padx=5)
 
+        def change_file_button_color(event):
+            self.file_button.config(fg="#eeeeee", bg="#4cb72c")
+
+        def reset_file_button_color(event=None):
+            self.file_button.config(fg="#ffffff", bg="#333333")
+
+        def change_edit_button_color(event):
+            self.edit_button.config(fg="#eeeeee", bg="#4cb72c")
+
+        def reset_edit_button_color(event=None):
+            self.edit_button.config(fg="#ffffff", bg="#333333")
+
+        def change_help_button_color(event):
+            self.help_button.config(fg="#eeeeee", bg="#4cb72c")
+
+        def reset_help_button_color(event=None):
+            self.help_button.config(fg="#ffffff", bg="#333333")
+
+        self.file_button.bind("<Enter>", change_file_button_color)
+        self.file_button.bind("<Leave>", reset_file_button_color)
+        self.file_button.bind("<ButtonRelease-1>", reset_file_button_color)
+
+        self.edit_button.bind("<Enter>", change_edit_button_color)
+        self.edit_button.bind("<Leave>", reset_edit_button_color)
+        self.edit_button.bind("<ButtonRelease-1>", reset_edit_button_color)
+
+        self.help_button.bind("<Enter>", change_help_button_color)
+        self.help_button.bind("<Leave>", reset_help_button_color)
+        self.help_button.bind("<ButtonRelease-1>", reset_help_button_color)
+
     def file_menu(self):
         # Create a popup menu for File
         menu = Menu(self.master, tearoff=0, bd=0, relief=FLAT, background="#333333", foreground="#ffffff",
                     activebackground="#4cb72c", activeforeground="#ffffff")
-        self.add_menu_item(menu, "Save", open_popup)
+        self.add_menu_item(menu, "New", open_popup)
         menu.add_separator()
         self.add_menu_item(menu, "Exit", self.master.destroy)
         menu.tk_popup(self.file_button.winfo_rootx(), self.file_button.winfo_rooty() + self.file_button.winfo_height())
@@ -286,6 +358,9 @@ class CustomMenuBar(Frame):
     def on_menu_item_leave(self, event, menu, index):
         menu.entryconfig(index, background="#333333", foreground="#ffffff")
 
+    
+
+
 
 def custom_command(event=None):
     command = commandbar.get()
@@ -296,7 +371,7 @@ def custom_command(event=None):
         else:
             messagebox.showerror("Error", "Path not found")
             print("custom_command: Error Path not found")
-    elif command == "mkdir":
+    elif command == "new":
         open_popup()
     elif command == "newpatch":
         new_patch()
@@ -307,7 +382,11 @@ def custom_command(event=None):
     elif command == "home":
         change_listbox_to_homescreen()
     elif command == "settings":
-        change_listbox_to_settings()
+        print('Attempt to get to settings section by the "settings" command')
+        messagebox.showinfo("Settings", "Settings are not available yet")
+    elif command == "options":
+        print('Attempt to get to settings section by the "options" command')
+        messagebox.showinfo("Settings", "Settings are not available yet")
     else:
         messagebox.showerror("Error", "Invalid command")
         print("custom_command: Error Unknown command")
@@ -341,8 +420,12 @@ list.bind('<Return>', changePathByClick)
 text_widget = Text(root, width=50, height=10)
 text_widget.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-text_widget_settings = Text(root, width=50, height=10)
-text_widget_settings.place(relx=0.5, rely=0.5, anchor=CENTER)
+version_text_text = "Version " + version3 + ". This app is still under development and can be unstable. Developer still makes huge and small changes, and he is not responsible to what happens at your place. The project is public, but do not distribute."
+version_text = Label(root, text=version_text_text, fg="#555555", bg="#222222", width=35, height=7, wraplength=200)
+version_text.place(relx=1.0, rely=1.0, anchor='se', x=10, y=0)
+
+# text_widget_settings = Text(root, width=50, height=10)
+# text_widget_settings.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 def change_listbox_to_homescreen(event=None):
         global back_button
@@ -371,38 +454,38 @@ def change_listbox_to_homescreen(event=None):
         back_button.bind("<ButtonRelease-1>", reset_back_btn_color)
 
 
-def change_listbox_to_settings(event=None):
-        global back_button_settings
-        list.delete(0, END)
-        list.pack_forget()
-        text_widget_settings.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-        text_widget_settings.delete(1.0, END)
-        text_widget_settings.insert(END, "Settings (coming soon)", "large_font")
-
-        text_widget_settings.tag_config("large_font", font=("Segoe UI Bold", 24), justify=CENTER)
-        text_widget_settings.tag_config("small_font", font=("Segoe UI", 12), justify=CENTER)
-
-        text_widget_settings.config(state=DISABLED, bg="#222222", bd=0, fg="#ffffff")
-
-        text_widget_settings.bind("<Button-1>", lambda e: "break")
-        text_widget_settings.bind("<B1-Motion>", lambda e: "break")
-
-        back_button_settings = Button(root, text="Back", command=show_listbox, bg="#333333", fg="#ffffff", border="0", width=15, font=("Segoe UI Bold", 14))
-        back_button_settings.place(relx=0.5, rely=0.7, anchor=CENTER)
-
-        back_button_settings.bind("<Enter>", change_back_btn_settings_color)
-
-        back_button_settings.bind("<Leave>", reset_back_btn_settings_color)
-        back_button_settings.bind("<ButtonRelease-1>", reset_back_btn_settings_color)
+# def change_listbox_to_settings(event=None):
+#         global back_button_settings
+#         list.delete(0, END)
+#         list.pack_forget()
+#         text_widget_settings.place(relx=0.5, rely=0.5, anchor=CENTER)
+# 
+#         text_widget_settings.delete(1.0, END)
+#         text_widget_settings.insert(END, "Settings (coming soon)", "large_font")
+# 
+#         text_widget_settings.tag_config("large_font", font=("Segoe UI Bold", 24), justify=CENTER)
+#         text_widget_settings.tag_config("small_font", font=("Segoe UI", 12), justify=CENTER)
+# 
+#         text_widget_settings.config(state=DISABLED, bg="#222222", bd=0, fg="#ffffff")
+# 
+#         text_widget_settings.bind("<Button-1>", lambda e: "break")
+#         text_widget_settings.bind("<B1-Motion>", lambda e: "break")
+# 
+#         back_button_settings = Button(root, text="Back", command=show_listbox, bg="#333333", fg="#ffffff", border="0", width=15, font=("Segoe UI Bold", 14))
+#         back_button_settings.place(relx=0.5, rely=0.7, anchor=CENTER)
+# 
+#         back_button_settings.bind("<Enter>", change_back_btn_settings_color)
+# 
+#         back_button_settings.bind("<Leave>", reset_back_btn_settings_color)
+#         back_button_settings.bind("<ButtonRelease-1>", reset_back_btn_settings_color)
 
 def show_listbox():
     global back_button
-    global back_button_settings
+    # global back_button_settings
     text_widget.place_forget()
     back_button.place_forget()
-    text_widget_settings.place_forget()
-    back_button_settings.place_forget()
+    # text_widget_settings.place_forget()
+    # back_button_settings.place_forget()
     list.pack(fill=BOTH, expand=True)
     pathChange()
 
