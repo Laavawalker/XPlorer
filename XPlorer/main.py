@@ -7,38 +7,76 @@ import pathlib
 import pickle
 from turtle import bgcolor
 import tkinter as tk
+import pystray
+from PIL import Image, ImageTk
+import threading
+import requests
+from io import BytesIO
+import PIL
+import time
+import random
+from pystray import MenuItem as item
+import sys
 # import win32gui
 # import win32con
 
+version1 = "Pre-alpha 3"
+version2 = "0.3.241021"
+version3 = "Pre-alpha 3 (0.3.241021)"
 # Increas Dots Per inch so it looks sharper
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
-# hidden window
-# hidden_window = Tk()
-# hidden_window.withdraw()
-# hidden_window.overrideredirect(False)
 
 
-# try:
-#    imageicon = PhotoImage(file=imgicn_path)
-# except Exception as e:
-#    print(f"Error loading image (icon): {e}")
-version1 = "Pre-alpha 3"
-version2 = "0.3.241020"
-version3 = "Pre-alpha 3 (0.3.241020)"
+def minimize_window():
+    root.withdraw()
+    threading.Thread(target=show_system_tray_icon, daemon=True).start()
+
+def restore_window(icon, item):
+    icon.stop()
+    root.after(0, root.deiconify)
+
+def create_simple_icon(color, size=(64, 64)):
+    image = Image.new('RGB', size, color=color)
+    return image
+
+def show_system_tray_icon():
+    global icon
+    
+    try:
+        # Create a simple colored icon
+        icon_image = create_simple_icon("yellow")  # You can change "blue" to any color you prefer
+        
+        # Create the menu
+        menu = pystray.Menu(item('Restore', restore_window))
+        
+        # Create and run the icon
+        icon_title = "XPlorer v" + version2
+        icon = pystray.Icon('name', icon_image, menu=menu, title=icon_title)
+        icon.run()
+    except Exception as e:
+        print(f"Error creating system tray icon: {e}")
+    
+    return
+
+
+
+def close_window():
+    global icon
+    if icon:
+        icon.stop()
+    root.destroy()
 
 class CustomTitleBar(Frame):
-    global close_button
-    global minimize_button
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
         self.master = master
         self.pack(fill="x")
 
-        self.close_button = Button(self, text="╳", command=self.master.destroy, bg="#333333", fg="#ffffff", bd=0)
+        self.close_button = Button(self, text="╳", command=close_window, bg="#333333", fg="#ffffff", bd=0)
         self.close_button.pack(side="right", padx=5)
 
-        self.minimize_button = Button(self, text="−",  command=print("minimize lol not working"), bg="#333333", fg="#ffffff", bd=0)
+        self.minimize_button = Button(self, text="−",  command=minimize_window, bg="#333333", fg="#ffffff", bd=0)
         self.minimize_button.pack(side="right", padx=5)
 
         self.title_text = "XPlorer " + version3
@@ -225,10 +263,30 @@ def new_patch():
     orange_box = Frame(top, bg="#dd4b39", width=150, height=280)
     orange_box.grid(row=1, column=1, rowspan=2, pady=15, padx=15)
 
-
-
-
-
+def mhelp():
+    global top
+    top = Toplevel(root)
+    top.geometry("400x700")
+    top.resizable(False, False)
+    top.title("Help")
+    top.columnconfigure(0, weight=1)
+    # top.iconbitmap("icon.ico")
+    top.config(bg="#333333")
+    Label(top, text='Help', fg="#ffffff", bg= "#333333", font="Segoe-UI 24", wraplength=300).grid()
+    Label(top, text="List of commands", fg="#ffffff", bg="#333333", font="Segoe-UI 16", wraplength=300).grid()
+    Label(top, text="new - opens a popup to make a new file or folder", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="about - opens a popup about the app", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="exit - closes the app", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="newpatch - opens the What's new? window", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="home - redirects to homescreen, which is a welcome screen", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="settings or options - comming soon | there's a huge problem with this, so I've disabled this. And if enabled there aren't any settings", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="help - (you read infos from this window now :) opens a window that contains some infos you'd probably ask about", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="More", fg="#ffffff", bg="#333333", font="Segoe-UI 16", wraplength=300).grid()
+    Label(top, text="If you minimize the main window, you shall see a yellow square in your tray. Right-click it, then select restore, and you restore the window. I don't know how it works on Linux or Mac.", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="If you're in the homescreen and clicking back gives you a blank screen, you should provide a valid path in the input.", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="When you launch this app, the homescreen will pop-up, just click back and nothing shouldn't stay on your way to return to a normal work of a file manager :)", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
+    Label(top, text="Contact", fg="#ffffff", bg="#333333", font="Segoe-UI 16", wraplength=300).grid()
+    Label(top, text="If you encounter any promlem that is not written about here, then fell free to ask me on Discord: gl.laavawalker", fg="#ffffff", bg="#333333", font="Segoe-UI 11", wraplength=300).grid()
 
 
 top = ''
@@ -335,6 +393,7 @@ class CustomMenuBar(Frame):
                     activebackground="#4cb72c", activeforeground="#ffffff")
         self.add_menu_item(menu, "Copy", copy_selected)
         self.add_menu_item(menu, "Paste", paste_copied)
+        self.add_menu_item(menu, "Delete", delete_selected)
         menu.tk_popup(self.edit_button.winfo_rootx(), self.edit_button.winfo_rooty() + self.edit_button.winfo_height())
 
     def help_menu(self):
@@ -343,6 +402,7 @@ class CustomMenuBar(Frame):
                     activebackground="#4cb72c", activeforeground="#ffffff")
         self.add_menu_item(menu, "About", about)
         self.add_menu_item(menu, "What's new?", new_patch)
+        self.add_menu_item(menu, "More help", mhelp)
         menu.tk_popup(self.help_button.winfo_rootx(), self.help_button.winfo_rooty() + self.help_button.winfo_height())
 
     def add_menu_item(self, menu, label, command):
@@ -379,6 +439,7 @@ def custom_command(event=None):
         about()
     elif command == "exit":
         root.destroy()
+        close_window()
     elif command == "home":
         change_listbox_to_homescreen()
     elif command == "settings":
@@ -387,6 +448,8 @@ def custom_command(event=None):
     elif command == "options":
         print('Attempt to get to settings section by the "options" command')
         messagebox.showinfo("Settings", "Settings are not available yet")
+    elif command == "help":
+        mhelp()
     else:
         messagebox.showerror("Error", "Invalid command")
         print("custom_command: Error Unknown command")
